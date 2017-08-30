@@ -18,14 +18,18 @@
 
 @implementation OptimizationTableViewCell{
     UIImageView *postBGView;
-    UIButton *avatarView;
+    UIButton *avatarViewBtn;
     UIImageView *cornerImage;
     UIView *topLine;
-    VVeboLabel *label;
-    VVeboLabel *detailLabel;
+    
+    VVeboLabel *labelVVeboLabel;
+    VVeboLabel *detailVVeboLabel;
+    
     UIScrollView *mulitPhotoScrollView;
-    BOOL drawed;
+    BOOL drawed; //是否已绘制,默认为NO
     NSInteger drawColorFlag;
+    
+    //评论坐标
     CGRect commentsRect;
     CGRect repostsRect;
 }
@@ -50,26 +54,31 @@
     if (self) {
         
         self.clipsToBounds = YES;
+        
+        //1.背后的图片,单元格的高度等于postBGView的高度
         postBGView = [[UIImageView alloc] initWithFrame:CGRectZero];
-        postBGView.backgroundColor = [UIColor  redColor];
+        //postBGView.backgroundColor = [UIColor  redColor];
         [self.contentView insertSubview:postBGView atIndex:0];
         
-        avatarView = [UIButton buttonWithType:UIButtonTypeCustom];//[[VVeboAvatarView alloc] initWithFrame:avatarRect];
-        avatarView.frame = CGRectMake(SIZE_GAP_LEFT, SIZE_GAP_TOP, SIZE_AVATAR, SIZE_AVATAR);
-        //avatarView.backgroundColor = [UIColor colorWithRed:250/255.0 green:250/255.0 blue:250/255.0 alpha:1];
-        avatarView.backgroundColor = [UIColor  lightGrayColor];
-        avatarView.hidden = NO;
-        avatarView.tag = NSIntegerMax;
-        avatarView.clipsToBounds = YES;
-        [self.contentView addSubview:avatarView];
+        //2.个人图像按钮
+        avatarViewBtn = [UIButton buttonWithType:UIButtonTypeCustom];//[[VVeboavatarViewBtn alloc] initWithFrame:avatarRect];
+        avatarViewBtn.frame = CGRectMake(SIZE_GAP_LEFT, SIZE_GAP_TOP, SIZE_AVATAR, SIZE_AVATAR);//15,13,40,40
+        //avatarViewBtn.backgroundColor = [UIColor colorWithRed:250/255.0 green:250/255.0 blue:250/255.0 alpha:1];
+        avatarViewBtn.backgroundColor = [UIColor  redColor];
+        avatarViewBtn.hidden = NO;
+        avatarViewBtn.tag = NSIntegerMax;
+        avatarViewBtn.clipsToBounds = YES;
+        [self.contentView addSubview:avatarViewBtn];
         
-        cornerImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, SIZE_AVATAR+5, SIZE_AVATAR+5)];
-        cornerImage.center = avatarView.center;
+        //3.覆盖在个人图像按钮上的 圆形透明 图片   可不创建这个相框
+        cornerImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, SIZE_AVATAR+5, SIZE_AVATAR+5)];//0,0,45,45
+        cornerImage.center = avatarViewBtn.center;
         cornerImage.image = [UIImage imageNamed:@"corner_circle@2x.png"];
         cornerImage.tag = NSIntegerMax;
-        cornerImage.backgroundColor = [UIColor  blueColor];
+        //cornerImage.backgroundColor = [UIColor  blueColor];
         [self.contentView addSubview:cornerImage];
         
+        //4.最下面的红色的线
         topLine = [[UIView alloc] initWithFrame:CGRectMake(0, self.height-.5, [UIScreen screenWidth], .5)];
         //topLine.backgroundColor = [UIColor colorWithRed:200/255.0 green:200/255.0 blue:200/255.0 alpha:1];
         topLine.backgroundColor = [UIColor  redColor];
@@ -78,22 +87,28 @@
         
         self.backgroundColor = [UIColor colorWithRed:250/255.0 green:250/255.0 blue:250/255.0 alpha:1];
         
+        //5.
         [self addLabel];
         
-        mulitPhotoScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+        //6.盛图片的滚动视图
+        mulitPhotoScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)]; //左边默认为0
         mulitPhotoScrollView.scrollsToTop = NO;
         mulitPhotoScrollView.showsHorizontalScrollIndicator = NO;
         mulitPhotoScrollView.showsVerticalScrollIndicator = NO;
         mulitPhotoScrollView.tag = NSIntegerMax;
-        mulitPhotoScrollView.hidden = YES;
+        mulitPhotoScrollView.hidden = YES; //默认隐藏
         [self.contentView addSubview:mulitPhotoScrollView];
-        int h2 = SIZE_GAP_IMG+SIZE_IMAGE;
+        
+    
+        int h2 = SIZE_GAP_IMG+SIZE_IMAGE;//5,80
+        
+        //循环创建 9张图片,放在 mulitPhotoScrollView 滚动视图上
         for (NSInteger i=0; i<9; i++) {
-            int g = SIZE_GAP_IMG;
-            int width = SIZE_IMAGE;
-            float x = SIZE_GAP_LEFT+(g+width)*(i%3);
+            int g = SIZE_GAP_IMG;//5
+            int width = SIZE_IMAGE;//80
+            float x = SIZE_GAP_LEFT+(g+width)*(i%3);//15
             float y = i/3*h2;
-            UIImageView *thumb1 = [[UIImageView alloc] initWithFrame:CGRectMake(x, y+2, SIZE_IMAGE, SIZE_IMAGE)];
+            UIImageView *thumb1 = [[UIImageView alloc] initWithFrame:CGRectMake(x, y+2, SIZE_IMAGE, SIZE_IMAGE)];//80,80
             thumb1.tag = i+1;
             [mulitPhotoScrollView addSubview:thumb1];
         }
@@ -108,49 +123,77 @@
     topLine.y = self.height-.5;
 }
 
-//赋值
+
+//中间动态改变的文字Label
+- (void)addLabel{
+    
+    //图像下面的 标签
+    if (labelVVeboLabel) {
+        [labelVVeboLabel removeFromSuperview];
+        labelVVeboLabel = nil;
+    }
+    
+    //详情标签detailVVeboLabel
+    if (detailVVeboLabel) {
+        detailVVeboLabel = nil;
+    }
+    
+    //1.图像下面的 标签
+    labelVVeboLabel = [[VVeboLabel alloc] initWithFrame:[_data[@"textRect"] CGRectValue]];
+    labelVVeboLabel.textColor = [UIColor colorWithRed:50/255.0 green:50/255.0 blue:50/255.0 alpha:1];
+    labelVVeboLabel.backgroundColor = [UIColor  blueColor];//self.backgroundColor;
+    [self.contentView addSubview:labelVVeboLabel];
+    
+    //2.详情标签
+    detailVVeboLabel = [[VVeboLabel alloc] initWithFrame:[_data[@"subTextRect"] CGRectValue]];
+    detailVVeboLabel.font = FontWithSize(SIZE_FONT_SUBCONTENT);
+    detailVVeboLabel.textColor = [UIColor colorWithRed:50/255.0 green:50/255.0 blue:50/255.0 alpha:1];;
+    detailVVeboLabel.backgroundColor = [UIColor  orangeColor];//[UIColor colorWithRed:243/255.0 green:243/255.0 blue:243/255.0 alpha:1];
+    [self.contentView  addSubview:detailVVeboLabel];
+}
+
+
+
+//1.赋值 --- 这里只赋值 左上角 图像按钮
 - (void)setData:(NSDictionary *)data{
+    
     _data = data;
-    [avatarView setBackgroundImage:nil forState:UIControlStateNormal];
+    
+    [avatarViewBtn setBackgroundImage:nil forState:UIControlStateNormal];
+    
+    //左上角按钮附图片
     if ([data valueForKey:@"avatarUrl"]) {
         NSURL *url = [NSURL URLWithString:[data valueForKey:@"avatarUrl"]];
-        [avatarView sd_setBackgroundImageWithURL:url forState:UIControlStateNormal placeholderImage:nil options:SDWebImageLowPriority];
+        [avatarViewBtn sd_setBackgroundImageWithURL:url forState:UIControlStateNormal placeholderImage:nil options:SDWebImageLowPriority];
     }
-}
-
-- (void)addLabel{
-    if (label) {
-        [label removeFromSuperview];
-        label = nil;
-    }
-    if (detailLabel) {
-        detailLabel = nil;
-    }
-    label = [[VVeboLabel alloc] initWithFrame:[_data[@"textRect"] CGRectValue]];
-    label.textColor = [UIColor colorWithRed:50/255.0 green:50/255.0 blue:50/255.0 alpha:1];
-    label.backgroundColor = [UIColor  orangeColor];//self.backgroundColor;
-    [self.contentView addSubview:label];
     
-    detailLabel = [[VVeboLabel alloc] initWithFrame:[_data[@"subTextRect"] CGRectValue]];
-    detailLabel.font = FontWithSize(SIZE_FONT_SUBCONTENT);
-    detailLabel.textColor = [UIColor colorWithRed:50/255.0 green:50/255.0 blue:50/255.0 alpha:1];;
-    detailLabel.backgroundColor = [UIColor  brownColor];//[UIColor colorWithRed:243/255.0 green:243/255.0 blue:243/255.0 alpha:1];
-    [self.contentView addSubview:detailLabel];
 }
 
-//将主要内容绘制到图片上
+
+//2.将主要内容绘制到图片上,异步处理
 - (void)draw{
+    
     if (drawed) {
+        //如果已绘制,return
         return;
     }
+    
     NSInteger flag = drawColorFlag;
-    drawed = YES;
+    
+    drawed = YES;//标记为已绘制
+    
+    //异步绘制
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        //1.从数据源中取出坐标
         CGRect rect = [_data[@"frame"] CGRectValue];
+        //2.开始绘制
         UIGraphicsBeginImageContextWithOptions(rect.size, YES, 0);
+        //3.绘制
         CGContextRef context = UIGraphicsGetCurrentContext();
         [[UIColor colorWithRed:250/255.0 green:250/255.0 blue:250/255.0 alpha:1] set];
         CGContextFillRect(context, rect);
+        
         if ([_data valueForKey:@"subData"]) {
             [[UIColor colorWithRed:243/255.0 green:243/255.0 blue:243/255.0 alpha:1] set];
             CGRect subFrame = [_data[@"subData"][@"frame"] CGRectValue];
@@ -223,34 +266,50 @@
             }
         }
         
+        //4.获取绘制好的图片
         UIImage *temp = UIGraphicsGetImageFromCurrentImageContext();
+        //5.结束绘制
         UIGraphicsEndImageContext();
+        //6.主线程刷新数据
         dispatch_async(dispatch_get_main_queue(), ^{
             if (flag==drawColorFlag) {
-                postBGView.frame = rect;
+                postBGView.frame = rect; //更改坐标,postBGView的坐标高度,就是单元格的高度
+                postBGView.backgroundColor = [UIColor  redColor];
                 postBGView.image = nil;
                 postBGView.image = temp;
             }
         });
+        
     });
+    
     [self drawText];
+    
+    //2.加载滚动视图 上的图片
     [self loadThumb];
 }
 
-//将文本内容绘制到图片上
+//3.将文本内容绘制到图片上
 - (void)drawText{
-    if (label==nil||detailLabel==nil) {
+    
+    if (labelVVeboLabel==nil || detailVVeboLabel==nil) {
+        
         [self addLabel];
     }
-    label.frame = [_data[@"textRect"] CGRectValue];
-    [label setText:_data[@"text"]];
+    
+    labelVVeboLabel.frame = [_data[@"textRect"] CGRectValue];
+    
+    [labelVVeboLabel setText:_data[@"text"]];
+    
     if ([_data valueForKey:@"subData"]) {
-        detailLabel.frame = [[_data valueForKey:@"subData"][@"textRect"] CGRectValue];
-        [detailLabel setText:[_data valueForKey:@"subData"][@"text"]];
-        detailLabel.hidden = NO;
+        detailVVeboLabel.frame = [[_data valueForKey:@"subData"][@"textRect"] CGRectValue];
+        [detailVVeboLabel setText:[_data valueForKey:@"subData"][@"text"]];
+        detailVVeboLabel.hidden = NO;
     }
+    
 }
 
+
+//4.滚动视图上的图片处理
 - (void)loadThumb{
     float y = 0;
     NSArray *urls;
@@ -263,15 +322,21 @@
         y = postRect.origin.y+postRect.size.height+SIZE_GAP_BIG;
         urls = _data[@"pic_urls"];
     }
+    
     if (urls.count>0) {
-        mulitPhotoScrollView.hidden = NO;
+        mulitPhotoScrollView.hidden = NO;//不隐藏
         mulitPhotoScrollView.y = y;
+        
+        //更改坐标
         mulitPhotoScrollView.frame = CGRectMake(0, y, [UIScreen screenWidth], SIZE_GAP_IMG+((SIZE_GAP_IMG+SIZE_IMAGE)*(urls.count)));
+        
         for (NSInteger i=0; i<9; i++) {
+            //获取上面创建好的 9个图像
             UIImageView *thumbView = (UIImageView *)[mulitPhotoScrollView viewWithTag:i+1];
             thumbView.contentMode = UIViewContentModeScaleAspectFill;
             thumbView.backgroundColor = [UIColor lightGrayColor];
             thumbView.clipsToBounds = YES;
+            
             if (i<urls.count) {
                 thumbView.frame = CGRectMake(SIZE_GAP_LEFT+(SIZE_GAP_IMG+SIZE_IMAGE)*i, .5, SIZE_IMAGE, SIZE_IMAGE);
                 thumbView.hidden = NO;
@@ -297,10 +362,11 @@
     }
     postBGView.frame = CGRectZero;
     postBGView.image = nil;
-    [label clear];
-    if (!detailLabel.hidden) {
-        detailLabel.hidden = YES;
-        [detailLabel clear];
+    [labelVVeboLabel clear];
+    
+    if (!detailVVeboLabel.hidden) {
+        detailVVeboLabel.hidden = YES;
+        [detailVVeboLabel clear];
     }
     for (UIImageView *thumb1 in mulitPhotoScrollView.subviews) {
         if (!thumb1.hidden) {

@@ -22,8 +22,19 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    self.title = @"优化";
     
+    
+    //2.NSValue可以包装任意一个对象，包括系统自定义的数据结构，结构体等等
+    
+    //3.NSNumber是NSValue的一个子类
+    
+    //NSValue
+    NSValue *pointValue = [NSValue  valueWithCGRect:CGRectMake(0, 0, 200, 30)];
+    [pointValue  CGRectValue];
+    
+    //NSLog(@"pointValue  == %@",pointValue);
+    //NSLog(@"pointValue  CGRectValue == %f",[pointValue  CGRectValue].size.height);
+
     tableView = [[OptimizationTableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     tableView.contentInset = UIEdgeInsetsMake(20, 0, 0, 0);
     tableView.scrollIndicatorInsets = tableView.contentInset;

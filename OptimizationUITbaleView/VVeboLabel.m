@@ -73,8 +73,11 @@ static inline NSRegularExpression * TopicRegularExpression() {
 }
 
 - (id)initWithFrame:(CGRect)frame {
+    
     self = [super initWithFrame:frame];
+    
     if (self) {
+        
         drawFlag = arc4random();
         framesDict = [[NSMutableDictionary alloc] init];
         highlightColors = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
@@ -82,6 +85,7 @@ static inline NSRegularExpression * TopicRegularExpression() {
                           [UIColor colorWithRed:106/255.0 green:140/255.0 blue:181/255.0 alpha:1],kRegexHighlightViewTypeURL,
                           [UIColor colorWithRed:106/255.0 green:140/255.0 blue:181/255.0 alpha:1],kRegexHighlightViewTypeEmoji,
                           [UIColor colorWithRed:106/255.0 green:140/255.0 blue:181/255.0 alpha:1],kRegexHighlightViewTypeTopic,nil];
+        
         labelImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, -5, frame.size.width, frame.size.height+10)];
         labelImageView.contentMode = UIViewContentModeScaleAspectFit;
         labelImageView.tag = NSIntegerMin;
@@ -176,7 +180,9 @@ static inline NSRegularExpression * TopicRegularExpression() {
         currentRange = NSMakeRange(-1, -1);
     }
     NSInteger flag = drawFlag;
+    
     BOOL isHighlight = highlighting;
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSString *temp = text;
         _text = text;

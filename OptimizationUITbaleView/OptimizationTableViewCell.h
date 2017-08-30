@@ -27,9 +27,17 @@
 
 
 @property (nonatomic, weak) NSDictionary *data;
+//绘制操作
 - (void)draw;
+
 - (void)clear;
+
 - (void)releaseMemory;
 
-
 @end
+
+
+
+
+
+
