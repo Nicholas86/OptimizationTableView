@@ -207,7 +207,7 @@
 //用户触摸时第一时间加载内容
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event{
     //NSLog(@" %s",__func__);
-    //NSLog(@" 用户触摸时第一时间加载内容");
+    NSLog(@" 用户触摸时第一时间加载内容");
 
     //NSLog(@" hitTest  bool %d",self.scrollToToping);
 

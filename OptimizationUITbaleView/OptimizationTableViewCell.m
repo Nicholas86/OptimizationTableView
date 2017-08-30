@@ -141,7 +141,7 @@
     //1.图像下面的 标签
     labelVVeboLabel = [[VVeboLabel alloc] initWithFrame:[_data[@"textRect"] CGRectValue]];
     labelVVeboLabel.textColor = [UIColor colorWithRed:50/255.0 green:50/255.0 blue:50/255.0 alpha:1];
-    labelVVeboLabel.backgroundColor = [UIColor  blueColor];//self.backgroundColor;
+    labelVVeboLabel.backgroundColor = [UIColor  lightGrayColor];//self.backgroundColor;
     [self.contentView addSubview:labelVVeboLabel];
     
     //2.详情标签
@@ -300,6 +300,7 @@
     
     [labelVVeboLabel setText:_data[@"text"]];
     
+    
     if ([_data valueForKey:@"subData"]) {
         detailVVeboLabel.frame = [[_data valueForKey:@"subData"][@"textRect"] CGRectValue];
         [detailVVeboLabel setText:[_data valueForKey:@"subData"][@"text"]];
@@ -329,7 +330,7 @@
         
         //更改坐标
         mulitPhotoScrollView.frame = CGRectMake(0, y, [UIScreen screenWidth], SIZE_GAP_IMG+((SIZE_GAP_IMG+SIZE_IMAGE)*(urls.count)));
-        
+        mulitPhotoScrollView.userInteractionEnabled = YES;
         for (NSInteger i=0; i<9; i++) {
             //获取上面创建好的 9个图像
             UIImageView *thumbView = (UIImageView *)[mulitPhotoScrollView viewWithTag:i+1];
@@ -340,6 +341,7 @@
             if (i<urls.count) {
                 thumbView.frame = CGRectMake(SIZE_GAP_LEFT+(SIZE_GAP_IMG+SIZE_IMAGE)*i, .5, SIZE_IMAGE, SIZE_IMAGE);
                 thumbView.hidden = NO;
+                thumbView.userInteractionEnabled = YES;
                 NSDictionary *url = urls[i];
                 [thumbView sd_setImageWithURL:[NSURL URLWithString:url[@"thumbnail_pic"]]];
             } else {
@@ -397,14 +399,5 @@
 
 
 @end
-
-
-
-
-
-
-
-
-
 
 
