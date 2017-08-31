@@ -25,6 +25,7 @@ typedef void(^touchBlock)(UITouch *t, UIView *target);
 - (float)boundsHeight;
 - (void)setBoundsWidth:(float)w;
 - (void)setBoundsHeight:(float)h;
+
 //
 //- (void)fadeIn;
 //- (void)fadeOut;
